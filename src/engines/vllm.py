@@ -38,12 +38,20 @@ class VLLMEngine(BaseEngine):
             self.host,
             "--port",
             str(self.port),
-            "--max-model-len", "1024"
+            "--max-model-len", "1024",
         ]
 
         print("Launching:", " ".join(cmd))
+        
+        # Save the handle so it doesn't get garbage-collected
+        self.log_file = open("vllm.log", "w", buffering=1)
 
-        self.process = subprocess.Popen(cmd)
+        self.process = subprocess.Popen(
+            cmd,
+            stdout=self.log_file,
+            stderr=subprocess.STDOUT,   # merge stderr into stdout
+            text=True,
+        )
 
         # later we'll replace with health checking
         time.sleep(5)

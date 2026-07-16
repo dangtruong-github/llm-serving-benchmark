@@ -18,12 +18,12 @@ import time
 from pathlib import Path
 
 from src.engines import create_engine
-
 from src.workload import (
     ReplayWorkload,
     BurstWorkload,
     PoissonWorkload,
 )
+from src.monitor import GPUMonitor
 
 
 def parse_args() -> argparse.Namespace:
@@ -154,10 +154,8 @@ def main() -> None:
 
     print("[3/5] Starting monitor...")
 
-    # TODO:
-    #
-    # monitor = GPUMonitor()
-    # monitor.start()
+    monitor = GPUMonitor(interval=0.5)
+    monitor.start()
 
     time.sleep(0.5)
 
