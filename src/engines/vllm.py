@@ -38,6 +38,7 @@ class VLLMEngine(BaseEngine):
             self.host,
             "--port",
             str(self.port),
+            "--max-model-len", "1024"
         ]
 
         print("Launching:", " ".join(cmd))

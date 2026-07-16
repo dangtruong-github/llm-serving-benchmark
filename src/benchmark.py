@@ -19,6 +19,12 @@ from pathlib import Path
 
 from src.engines import create_engine
 
+from src.workload import (
+    ReplayWorkload,
+    BurstWorkload,
+    PoissonWorkload,
+)
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -112,17 +118,33 @@ def main() -> None:
     # --------------------------------------------------
     # Create workload
     # --------------------------------------------------
-
+        
     print("[2/5] Loading workload...")
 
-    # TODO:
-    #
-    # if args.workload == "replay":
-    #     workload = ReplayWorkload(args.trace)
-    # elif args.workload == "burst":
-    #     workload = BurstWorkload(args.trace)
-    # elif args.workload == "poisson":
-    #     workload = PoissonWorkload(args.trace, rate=args.rate)
+    if args.trace is None:
+        raise ValueError(
+            "--trace must be provided for replay, burst, and poisson workloads."
+        )
+
+    if not args.trace.exists():
+        raise FileNotFoundError(args.trace)
+
+    if args.workload == "replay":
+        workload = ReplayWorkload(args.trace)
+
+    elif args.workload == "burst":
+        workload = BurstWorkload(args.trace)
+
+    elif args.workload == "poisson":
+        workload = PoissonWorkload(
+            args.trace,
+            rate=args.rate,
+        )
+
+    else:
+        raise ValueError(f"Unknown workload: {args.workload}")
+
+    print(f"Loaded {len(workload)} requests")
 
     time.sleep(0.5)
 

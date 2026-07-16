@@ -1,13 +1,11 @@
 from __future__ import annotations
 
-from .loader import load_jsonl
+from .base import BaseWorkload
 
 
-class BurstWorkload:
+class BurstWorkload(BaseWorkload):
+    """All requests arrive at time zero."""
 
-    def __init__(self, trace_path):
-        self.requests = load_jsonl(trace_path)
-
-    def __iter__(self):
+    def _prepare(self) -> None:
         for req in self.requests:
-            yield 0.0, req
+            req.timestamp_ms = 0
