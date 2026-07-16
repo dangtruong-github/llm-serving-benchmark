@@ -17,6 +17,8 @@ import argparse
 import time
 from pathlib import Path
 
+from src.engines import create_engine
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -34,11 +36,7 @@ def parse_args() -> argparse.Namespace:
         "--model",
         required=True,
         choices=[
-            "qwen2.5-0.5b",
-            "qwen2.5-1.5b",
-            "qwen2.5-3b",
-            "granite-3b",
-            "llama3.2-1b",
+            "Qwen/Qwen3.5-0.8B"
         ],
         help="Model to benchmark",
     )
@@ -106,10 +104,8 @@ def main() -> None:
 
     print("[1/5] Initializing serving engine...")
 
-    # TODO:
-    #
-    # engine = create_engine(args.engine)
-    # engine.start()
+    engine = create_engine(args.engine, args.model)
+    engine.start()
 
     time.sleep(0.5)
 
