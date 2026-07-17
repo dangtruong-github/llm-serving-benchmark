@@ -7,6 +7,7 @@ from pathlib import Path
 
 @dataclass
 class Request:
+    request_id: int
     timestamp_ms: int
     body: dict
 
@@ -25,6 +26,7 @@ def load_jsonl(path: str | Path) -> list[Request]:
 
             requests.append(
                 Request(
+                    request_id=obj.get("request_id", 0),
                     timestamp_ms=obj.get("timestamp_ms", 0),
                     body=obj["body"],
                 )

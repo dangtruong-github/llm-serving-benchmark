@@ -16,6 +16,7 @@ from __future__ import annotations
 import argparse
 import time
 from pathlib import Path
+import asyncio
 
 from src.engines import create_engine
 from src.workload import (
@@ -166,13 +167,33 @@ def main() -> None:
     print("[4/5] Running benchmark...")
 
     start = time.perf_counter()
+    print("[4/5] Running benchmark...")
 
-    # TODO:
-    #
-    # client = AsyncClient(...)
-    # results = client.run(workload)
+    async def run_benchmark():
+        semaphore = asyncio.Semaphore(args.concurrency)
+        tasks = []
 
-    time.sleep(2)
+        async def submit(request):
+            async with semaphore:
+                return await engine.generate(request)
+
+        benchmark_start = time.perf_counter()
+
+        for request in workload:
+            # workload specifies arrival time in seconds\
+            elapsed_time = (time.perf_counter() - benchmark_start) * 1000
+            delay = request.timestamp_ms - elapsed_time
+
+            if delay > 0:
+                await asyncio.sleep(delay / 1000)
+
+            tasks.append(asyncio.create_task(submit(request)))
+
+        return await asyncio.gather(*tasks)
+
+    start = time.perf_counter()
+
+    results = asyncio.run(run_benchmark())
 
     elapsed = time.perf_counter() - start
 
